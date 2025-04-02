@@ -130,7 +130,7 @@ class HomePanel extends JPanel
 	// Update that label in paintComponent.
 	public void paintComponent(Graphics g)
 	{
-		
+		super.paintComponent(g);
 	}
 }
 
