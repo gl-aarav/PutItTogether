@@ -1,422 +1,314 @@
-/*
- * Aarav Goyal
- * 3.31.2025
- * PutItTogether.java
- */ 
-
-import java.awt.Graphics;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Image;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
-import java.awt.GridLayout;
-import java.awt.CardLayout;
-import java.awt.BorderLayout;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JButton;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
-import javax.swing.JTextArea;
-import javax.swing.JLabel;
-import javax.swing.JSlider;
-import javax.swing.JCheckBox;
-import javax.swing.JScrollBar;
-import javax.swing.ImageIcon;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseListener;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import java.awt.event.MouseEvent;
 
-public class PutItTogether
-{	
-    public static void main(String[] args)
-    {
-        PutItTogether pit = new PutItTogether();
-        pit.run();
-    }
-
-    public void run()
+public class PutItTogether 
+{
+    public static void main(String[] args) 
     {
         JFrame frame = new JFrame("PutItTogether");
         frame.setSize(800, 800);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLocation(100, 50);
+        frame.setLocation(0, 50);
         frame.setResizable(true);
-        PutItTogetherHolder pith = new PutItTogetherHolder();
-        frame.getContentPane().add(pith);
+        frame.getContentPane().add(new PutItTogetherHolder());
         frame.setVisible(true);
     }
 }
 
-class PutItTogetherHolder extends JPanel
-{	
-    public PutItTogetherHolder()
+class PutItTogetherHolder extends JPanel 
+{
+    public PutItTogetherHolder() 
     {
-        setBackground(Color.CYAN);
-
-        CardLayout cards = new CardLayout();
-        setLayout(cards);
-
+        setLayout(new CardLayout());
         Information info = new Information();
-        FirstPagePanel fpp = new FirstPagePanel(this, cards, info);
-        FixedPanelHolder hph = new FixedPanelHolder(info, cards, this);
 
-        add(fpp, "First");
-        add(hph, "Home");
+        FirstPagePanel first = new FirstPagePanel(this, info);
+        HomePanelHolder homeHolder = new HomePanelHolder(this, info);
+
+        add(first, "First");
+        add(homeHolder, "HomeHolder");
     }
 }
 
-class FirstPagePanel extends JPanel
+class FirstPagePanel extends JPanel 
 {
-    private PutItTogetherHolder panelCards;
-    private CardLayout cards;
-    private Information info;
-    private JTextField tfName;
-
-    public FirstPagePanel(PutItTogetherHolder panelCardsIn, CardLayout cardsIn, Information infoIn)
+    public FirstPagePanel(JPanel parent, Information info) 
     {
-        panelCards = panelCardsIn;
-        cards = cardsIn;
-        info = infoIn;
-
         setLayout(null);
 
-        JTextArea textArea = new JTextArea("Introduction message...\nPage descriptions...");
-        JScrollPane scrollPane = new JScrollPane(textArea);
-        scrollPane.setBounds(10, 10, 760, 200);
-        add(scrollPane);
+        JTextArea taIntro = new JTextArea("Welcome!\n\n- This program shows multiple pages using CardLayout.\n- Enter your name and click the checkbox to proceed.\n- You will see friend info and a drawing section.\n\nEnjoy!");
+        taIntro.setLineWrap(true);
+        taIntro.setWrapStyleWord(true);
+        JScrollPane scroll = new JScrollPane(taIntro);
+        scroll.setBounds(10, 10, 780, 600);
+        add(scroll);
 
-        tfName = new JTextField("Enter your name");
-        tfName.setBounds(10, 220, 200, 30);
+        JLabel lblName = new JLabel("Enter your name:");
+        lblName.setBounds(10, 620, 150, 30);
+        add(lblName);
+
+        JTextField tfName = new JTextField();
+        tfName.setBounds(160, 620, 200, 30);
         add(tfName);
 
-        JCheckBox checkBox = new JCheckBox("I understand the directions");
-        checkBox.setBounds(10, 260, 250, 30);
-        add(checkBox);
+        JCheckBox cbUnderstand = new JCheckBox("I understand the directions");
+        cbUnderstand.setBounds(10, 660, 300, 30);
+        add(cbUnderstand);
 
-        JButton nextButton = new JButton("Next");
-        nextButton.setBounds(350, 720, 100, 30);
-        nextButton.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
+        JButton btnNext = new JButton("Next");
+        btnNext.setBounds(700, 720, 80, 30);
+        btnNext.addActionListener(e -> {
+            if (cbUnderstand.isSelected() && !tfName.getText().trim().isEmpty()) 
             {
-                info.setName(tfName.getText());
-                cards.show(panelCards, "Home");
+                info.setName(tfName.getText().trim());
+                CardLayout cl = (CardLayout) parent.getLayout();
+                cl.show(parent, "HomeHolder");
+            } else {
+                JOptionPane.showMessageDialog(null, "Please enter your name and check the box.");
             }
         });
-        add(nextButton);
+        add(btnNext);
     }
 }
 
-class FixedPanelHolder extends JPanel
+class HomePanelHolder extends JPanel 
 {
-    private Information info;
-    private JButton homeButton;
-    private CardLayout cards;
-    private PutItTogetherHolder panelCards;
-
-    public FixedPanelHolder(Information infoIn, CardLayout cardsIn, PutItTogetherHolder panelCardsIn)
+    public HomePanelHolder(JPanel parent, Information info) 
     {
-        info = infoIn;
-        cards = cardsIn;
-        panelCards = panelCardsIn;
+        setLayout(new CardLayout());
 
-        setLayout(cards);
+        HomePanel home = new HomePanel(this, info);
+        BothPictPanel both = new BothPictPanel(this);
+        PersonPanel p1 = new PersonPanel("Person 1", "01-01-1990", "Age: 35", "Hobbies: Reading, Traveling", "person1.jpg", this, "Person2");
+        PersonPanel p2 = new PersonPanel("Person 2", "02-02-1992", "Age: 33", "Hobbies: Cooking, Hiking", "person2.jpg", this, "Person1");
+        DrawPanel draw = new DrawPanel(this);
 
-        HomePanel homePanel = new HomePanel(info);
-        BothPictPanel bothPictPanel = new BothPictPanel(cards, panelCards);
-        MyPictPanel myPictPanel = new MyPictPanel(cards, panelCards);
-        FriendPictPanel friendPictPanel = new FriendPictPanel(cards, panelCards);
-        DrawPanel drawPanel = new DrawPanel();
-
-        add(homePanel, "Home");
-        add(bothPictPanel, "BothPict");
-        add(myPictPanel, "MyPict");
-        add(friendPictPanel, "FriendPict");
-        add(drawPanel, "Draw");
+        add(home, "Home");
+        add(both, "BothPict");
+        add(p1, "Person1");
+        add(p2, "Person2");
+        add(draw, "Draw");
     }
 }
 
-class HomePanel extends JPanel
+class HomePanel extends JPanel 
 {
-    private Information info;
-
-    public HomePanel(Information infoIn)
+    public HomePanel(JPanel parent, Information info) 
     {
-        info = infoIn;
         setLayout(new BorderLayout());
 
-        JLabel welcomeLabel = new JLabel("Welcome " + info.getName(), JLabel.CENTER);
-        add(welcomeLabel, BorderLayout.NORTH);
+        JLabel lblWelcome = new JLabel("Welcome, " + info.getName(), SwingConstants.CENTER);
+        add(lblWelcome, BorderLayout.NORTH);
 
-        JTextArea instructionsArea = new JTextArea("Directions for this page...\nWhat to expect...");
-        add(instructionsArea, BorderLayout.CENTER);
+        JTextArea ta = new JTextArea("Please select which page you would like to see.\n\n- To see information about a friend and me.\n- To make some colors and draw some shapes.");
+        ta.setEditable(false);
+        add(ta, BorderLayout.CENTER);
 
-        JPanel radioPanel = new JPanel(new GridLayout(3, 1));
-        radioPanel.add(new JLabel("Please select which page you would like to see:"));
-        JRadioButton friendInfoButton = new JRadioButton("To see information about a friend and me.");
-        JRadioButton drawShapesButton = new JRadioButton("To make some colors and draw some shapes.");
-        radioPanel.add(friendInfoButton);
-        radioPanel.add(drawShapesButton);
-        add(radioPanel, BorderLayout.SOUTH);
+        JPanel choices = new JPanel();
+        choices.setLayout(new BoxLayout(choices, BoxLayout.Y_AXIS));
+
+        JRadioButton rbFriend = new JRadioButton("To see information about a friend and me.");
+        JRadioButton rbDraw = new JRadioButton("To make some colors and draw some shapes.");
+        ButtonGroup group = new ButtonGroup();
+        group.add(rbFriend);
+        group.add(rbDraw);
+
+        rbFriend.addActionListener(e -> ((CardLayout) parent.getLayout()).show(parent, "BothPict"));
+        rbDraw.addActionListener(e -> ((CardLayout) parent.getLayout()).show(parent, "Draw"));
+
+        choices.add(rbFriend);
+        choices.add(rbDraw);
+        add(choices, BorderLayout.WEST);
+
+        JButton btnHome = new JButton("Home");
+        btnHome.addActionListener(e -> ((CardLayout) parent.getLayout()).show(parent, "Home"));
+        add(btnHome, BorderLayout.SOUTH);
+    }
+}
+
+class BothPictPanel extends JPanel 
+{
+    private Image image;
+
+    public BothPictPanel(JPanel parent) 
+    {
+        try 
+        {
+            image = ImageIO.read(new File("wholePhoto.jpg"));
+        } 
+        catch (IOException e) 
+        {
+            e.printStackTrace();
+        }
+
+        addMouseListener(new MouseAdapter() 
+        {
+            public void mouseClicked(MouseEvent e) 
+            {
+                int x = e.getX();
+                if (x < getWidth() / 2) 
+                {
+                    ((CardLayout) parent.getLayout()).show(parent, "Person1");
+                } 
+                else 
+                {
+                    ((CardLayout) parent.getLayout()).show(parent, "Person2");
+                }
+            }
+        });
     }
 
-    @Override
-    public void paintComponent(Graphics g)
+    protected void paintComponent(Graphics g)
     {
         super.paintComponent(g);
+        if (image != null)
+        {
+            int imgWidth = image.getWidth(null);
+            int imgHeight = image.getHeight(null);
+            double imgAspect = (double) imgWidth / imgHeight;
+
+            int panelWidth = this.getWidth();
+            int panelHeight = this.getHeight();
+            double panelAspect = (double) panelWidth / panelHeight;
+
+            int drawWidth, drawHeight;
+            if (imgAspect > panelAspect) 
+            {
+                drawWidth = panelWidth;
+                drawHeight = (int) (panelWidth / imgAspect);
+            } 
+            else 
+            {
+                drawHeight = panelHeight;
+                drawWidth = (int) (panelHeight * imgAspect);
+            }
+
+            int x = (panelWidth - drawWidth) / 2;
+            int y = (panelHeight - drawHeight) / 2;
+
+            g.drawImage(image, x, y, drawWidth, drawHeight, this);
+        }
     }
 }
 
-class BothPictPanel extends JPanel implements MouseListener
+class PersonPanel extends JPanel 
 {
-    private CardLayout cards;
-    private PutItTogetherHolder panelCards;
-    private Image person1Image;
-    private Image person2Image;
-
-    public BothPictPanel(CardLayout cardsIn, PutItTogetherHolder panelCardsIn)
+    public PersonPanel(String name, String dob, String age, String hobbies, String imagePath, JPanel parent, String otherCard) 
     {
-        cards = cardsIn;
-        panelCards = panelCardsIn;
-
         setLayout(new BorderLayout());
 
-        JLabel instructionsLabel = new JLabel("Click on a person to see more information about them.");
-        add(instructionsLabel, BorderLayout.NORTH);
+        JPanel infoPanel = new JPanel();
+        infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+        infoPanel.add(new JLabel("Name: " + name));
+        infoPanel.add(new JLabel("DOB: " + dob));
+        infoPanel.add(new JLabel(age));
+        infoPanel.add(new JLabel(hobbies));
+        add(infoPanel, BorderLayout.WEST);
 
-        JPanel picturePanel = new JPanel(new GridLayout(1, 2));
-        try
+        Image image = null;
+        try 
         {
-            person1Image = ImageIO.read(new File("person1.jpg"));
-            person2Image = ImageIO.read(new File("person2.jpg"));
-        }
-        catch (IOException e)
+            image = ImageIO.read(new File(imagePath));
+        } 
+        catch (IOException e) 
         {
             e.printStackTrace();
         }
-        JLabel person1Label = new JLabel(new ImageIcon(person1Image));
-        JLabel person2Label = new JLabel(new ImageIcon(person2Image));
-        picturePanel.add(person1Label);
-        picturePanel.add(person2Label);
 
-        person1Label.addMouseListener(this);
-        person2Label.addMouseListener(this);
+        Image finalImage = image;
+        JPanel imagePanel = new JPanel() 
+        {
+            protected void paintComponent(Graphics g) 
+            {
+                super.paintComponent(g);
+                if (finalImage != null) 
+                {
+                    int iw = finalImage.getWidth(null);
+                    int ih = finalImage.getHeight(null);
+                    int pw = getWidth();
+                    int ph = getHeight();
+                    double ratio = Math.min((double) pw / iw, (double) ph / ih);
+                    int w = (int) (iw * ratio);
+                    int h = (int) (ih * ratio);
+                    g.drawImage(finalImage, (pw - w) / 2, (ph - h) / 2, w, h, this);
+                }
+            }
+        };
+        add(imagePanel, BorderLayout.CENTER);
 
-        add(picturePanel, BorderLayout.CENTER);
+        JPanel bottomPanel = new JPanel();
+        JButton btnOther = new JButton("<html><center>See info for<br>the other person</center></html>");
+        btnOther.addActionListener(e -> ((CardLayout) parent.getLayout()).show(parent, otherCard));
+        bottomPanel.add(btnOther);
+
+        JButton btnHome = new JButton("Home");
+        btnHome.addActionListener(e -> ((CardLayout) parent.getLayout()).show(parent, "Home"));
+        bottomPanel.add(btnHome);
+
+        add(bottomPanel, BorderLayout.SOUTH);
     }
-
-    public void mouseClicked(MouseEvent e)
-    {
-        cards.show(panelCards, "MyPict");
-    }
-
-    public void mousePressed(MouseEvent e) {}
-
-    public void mouseReleased(MouseEvent e) {}
-
-    public void mouseEntered(MouseEvent e) {}
-
-    public void mouseExited(MouseEvent e) {}
 }
 
-class MyPictPanel extends JPanel implements ActionListener
+class DrawPanel extends JPanel 
 {
-    private CardLayout cards;
-    private PutItTogetherHolder panelCards;
-    private Image personImage;
+    private int red = 255, green = 0, blue = 255, size = 100;
 
-    public MyPictPanel(CardLayout cardsIn, PutItTogetherHolder panelCardsIn)
-    {
-        cards = cardsIn;
-        panelCards = panelCardsIn;
-
+    public DrawPanel(JPanel parent) {
         setLayout(new BorderLayout());
 
-        try
+        JPanel left = new JPanel(new GridLayout(4, 2));
+
+        JSlider sRed = new JSlider(0, 255, red);
+        JSlider sGreen = new JSlider(0, 255, green);
+        JSlider sBlue = new JSlider(0, 255, blue);
+        JScrollBar sSize = new JScrollBar(JScrollBar.HORIZONTAL, size, 0, 0, 100);
+
+        left.add(new JLabel("Red:")); left.add(sRed);
+        left.add(new JLabel("Green:")); left.add(sGreen);
+        left.add(new JLabel("Blue:")); left.add(sBlue);
+        left.add(new JLabel("Size:")); left.add(sSize);
+
+        JPanel right = new JPanel() 
         {
-            personImage = ImageIO.read(new File("person1.jpg"));
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-        JLabel personLabel = new JLabel(new ImageIcon(personImage));
-        add(personLabel, BorderLayout.NORTH);
+            protected void paintComponent(Graphics g) 
+            {
+                super.paintComponent(g);
+                g.setColor(new Color(red, green, blue));
+                g.fillRect(50, 50, size, size);
+            }
+        };
 
-        JPanel infoPanel = new JPanel(new GridLayout(5, 1));
-        infoPanel.add(new JLabel("Name: Person 1"));
-        infoPanel.add(new JLabel("Date of Birth: 01/01/1990"));
-        infoPanel.add(new JLabel("Age: 35"));
-        infoPanel.add(new JLabel("Hobbies: Reading, Hiking"));
-        add(infoPanel, BorderLayout.CENTER);
+        sRed.addChangeListener(e -> { red = sRed.getValue(); right.repaint(); });
+        sGreen.addChangeListener(e -> { green = sGreen.getValue(); right.repaint(); });
+        sBlue.addChangeListener(e -> { blue = sBlue.getValue(); right.repaint(); });
+        sSize.addAdjustmentListener(e -> { size = sSize.getValue(); right.repaint(); });
 
-        JButton otherPersonButton = new JButton("<html><center>See info for<br>the other person</center></html>");
-        otherPersonButton.addActionListener(this);
-        add(otherPersonButton, BorderLayout.SOUTH);
-    }
+        left.setPreferredSize(new Dimension(200, 600));
+        right.setPreferredSize(new Dimension(580, 600));
+        add(left, BorderLayout.WEST);
+        add(right, BorderLayout.CENTER);
 
-    public void actionPerformed(ActionEvent e)
-    {
-        cards.show(panelCards, "FriendPict");
+        JButton btnHome = new JButton("Home");
+        btnHome.addActionListener(e -> ((CardLayout) parent.getLayout()).show(parent, "Home"));
+        add(btnHome, BorderLayout.SOUTH);
     }
 }
 
-class FriendPictPanel extends JPanel implements ActionListener
+class Information 
 {
-    private CardLayout cards;
-    private PutItTogetherHolder panelCards;
-    private Image personImage;
+    private String name = "";
 
-    public FriendPictPanel(CardLayout cardsIn, PutItTogetherHolder panelCardsIn)
-    {
-        cards = cardsIn;
-        panelCards = panelCardsIn;
-
-        setLayout(new BorderLayout());
-
-        try
-        {
-            personImage = ImageIO.read(new File("person2.jpg"));
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-        JLabel personLabel = new JLabel(new ImageIcon(personImage));
-        add(personLabel, BorderLayout.NORTH);
-
-        JPanel infoPanel = new JPanel(new GridLayout(5, 1));
-        infoPanel.add(new JLabel("Name: Person 2"));
-        infoPanel.add(new JLabel("Date of Birth: 02/02/1992"));
-        infoPanel.add(new JLabel("Age: 33"));
-        infoPanel.add(new JLabel("Hobbies: Gaming, Cooking"));
-        add(infoPanel, BorderLayout.CENTER);
-
-        JButton otherPersonButton = new JButton("<html><center>See info for<br>the other person</center></html>");
-        otherPersonButton.addActionListener(this);
-        add(otherPersonButton, BorderLayout.SOUTH);
-    }
-
-    public void actionPerformed(ActionEvent e)
-    {
-        cards.show(panelCards, "MyPict");
-    }
-}
-
-class DrawPanel extends JPanel
-{
-    private RightPanel rp;
-    private int amtRed, amtGreen, amtBlue;
-    private int size;
-
-    public DrawPanel()
-    {
-        setLayout(new BorderLayout());
-
-        LeftPanel lp = new LeftPanel();
-        rp = new RightPanel();
-
-        add(lp, BorderLayout.WEST);
-        add(rp, BorderLayout.CENTER);
-
-        amtRed = 255;
-        amtGreen = 0;
-        amtBlue = 255;
-        size = 100;
-    }
-
-    public class LeftPanel extends JPanel
-    {
-        public LeftPanel()
-        {
-            setLayout(new GridLayout(4, 1));
-
-            JLabel redLabel = new JLabel("Red:");
-            JSlider redSlider = new JSlider(0, 255, 255);
-            redSlider.addChangeListener(new ChangeListener()
-            {
-                public void stateChanged(ChangeEvent e)
-                {
-                    amtRed = redSlider.getValue();
-                    rp.repaint();
-                }
-            });
-
-            JLabel greenLabel = new JLabel("Green:");
-            JSlider greenSlider = new JSlider(0, 255, 0);
-            greenSlider.addChangeListener(new ChangeListener()
-            {
-                public void stateChanged(ChangeEvent e)
-                {
-                    amtGreen = greenSlider.getValue();
-                    rp.repaint();
-                }
-            });
-
-            JLabel blueLabel = new JLabel("Blue:");
-            JSlider blueSlider = new JSlider(0, 255, 255);
-            blueSlider.addChangeListener(new ChangeListener()
-            {
-                public void stateChanged(ChangeEvent e)
-                {
-                    amtBlue = blueSlider.getValue();
-                    rp.repaint();
-                }
-            });
-
-            JLabel sizeLabel = new JLabel("Size:");
-            JScrollBar sizeScrollBar = new JScrollBar(JScrollBar.HORIZONTAL, 100, 0, 0, 100);
-            sizeScrollBar.addAdjustmentListener(new java.awt.event.AdjustmentListener()
-            {
-                public void adjustmentValueChanged(java.awt.event.AdjustmentEvent e)
-                {
-                    size = sizeScrollBar.getValue();
-                    rp.repaint();
-                }
-            });
-
-            add(redLabel);
-            add(redSlider);
-            add(greenLabel);
-            add(greenSlider);
-            add(blueLabel);
-            add(blueSlider);
-            add(sizeLabel);
-            add(sizeScrollBar);
-        }
-    }
-
-    public class RightPanel extends JPanel
-    {
-        public void paintComponent(Graphics g)
-        {
-            super.paintComponent(g);
-            g.setColor(new Color(amtRed, amtGreen, amtBlue));
-            g.fillRect((getWidth() - size) / 2, (getHeight() - size) / 2, size, size);
-        }
-    }
-}
-
-class Information
-{
-    private String name;
-
-    public Information() {}
-
-    public String getName()
+    public String getName() 
     {
         return name;
     }
 
-    public void setName(String nameIn)
+    public void setName(String name) 
     {
-        name = nameIn;
+        this.name = name;
     }
 }
