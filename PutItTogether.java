@@ -1,9 +1,46 @@
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
+/* 
+ * Aarav Goyal
+ * PutItTogether.java
+ * 4/8/2025
+ */
+
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.ButtonGroup;
+import javax.swing.JOptionPane;
+import javax.swing.SwingConstants;
+
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Graphics;
+import java.awt.GridLayout;
+import java.awt.Image;
+
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
 import java.io.File;
 import java.io.IOException;
+
+import javax.swing.JSlider;
 import javax.imageio.ImageIO;
+
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 public class PutItTogether 
 {
@@ -61,14 +98,20 @@ class FirstPagePanel extends JPanel
 
         JButton btnNext = new JButton("Next");
         btnNext.setBounds(700, 720, 80, 30);
-        btnNext.addActionListener(e -> {
-            if (cbUnderstand.isSelected() && !tfName.getText().trim().isEmpty()) 
+        btnNext.addActionListener(new ActionListener() 
+        {
+            public void actionPerformed(ActionEvent e) 
             {
-                info.setName(tfName.getText().trim());
-                CardLayout cl = (CardLayout) parent.getLayout();
-                cl.show(parent, "HomeHolder");
-            } else {
-                JOptionPane.showMessageDialog(null, "Please enter your name and check the box.");
+                if (cbUnderstand.isSelected() && !tfName.getText().trim().isEmpty()) 
+                {
+                    info.setName(tfName.getText().trim());
+                    CardLayout cl = (CardLayout) parent.getLayout();
+                    cl.show(parent, "HomeHolder");
+                } 
+                else 
+                {
+                    JOptionPane.showMessageDialog(null, "Please enter your name and check the box.");
+                }
             }
         });
         add(btnNext);
@@ -104,28 +147,62 @@ class HomePanel extends JPanel
         JLabel lblWelcome = new JLabel("Welcome, " + info.getName(), SwingConstants.CENTER);
         add(lblWelcome, BorderLayout.NORTH);
 
-        JTextArea ta = new JTextArea("Please select which page you would like to see.\n\n- To see information about a friend and me.\n- To make some colors and draw some shapes.");
+        JTextArea ta = new JTextArea("Please select which page you would like to see.\n\n"
+            + "- To see information about a friend and me.\n"
+            + "- To make some colors and draw some shapes.\n"
+            + "- To display my masterpiece.");
         ta.setEditable(false);
         add(ta, BorderLayout.CENTER);
 
-        JPanel choices = new JPanel();
-        choices.setLayout(new BoxLayout(choices, BoxLayout.Y_AXIS));
+        JPanel choices = new JPanel(new GridLayout(3, 1, 5, 10));
 
         JRadioButton rbFriend = new JRadioButton("To see information about a friend and me.");
         JRadioButton rbDraw = new JRadioButton("To make some colors and draw some shapes.");
+        JRadioButton rbMasterpiece = new JRadioButton("Display my masterpiece.");
+
         ButtonGroup group = new ButtonGroup();
         group.add(rbFriend);
         group.add(rbDraw);
+        group.add(rbMasterpiece);
 
-        rbFriend.addActionListener(e -> ((CardLayout) parent.getLayout()).show(parent, "BothPict"));
-        rbDraw.addActionListener(e -> ((CardLayout) parent.getLayout()).show(parent, "Draw"));
+        rbFriend.addActionListener(new ActionListener() 
+        {
+            public void actionPerformed(ActionEvent e) 
+            {
+                ((CardLayout) parent.getLayout()).show(parent, "BothPict");
+            }
+        });
+
+        rbDraw.addActionListener(new ActionListener() 
+        {
+            public void actionPerformed(ActionEvent e) 
+            {
+                ((CardLayout) parent.getLayout()).show(parent, "Draw");
+            }
+        });
+
+        rbMasterpiece.addActionListener(new ActionListener() 
+        {
+            public void actionPerformed(ActionEvent e) 
+            {
+                Masterpiece mp = new Masterpiece();
+                mp.runIt();
+            }
+        });
 
         choices.add(rbFriend);
         choices.add(rbDraw);
+        choices.add(rbMasterpiece);
         add(choices, BorderLayout.WEST);
 
         JButton btnHome = new JButton("Home");
-        btnHome.addActionListener(e -> ((CardLayout) parent.getLayout()).show(parent, "Home"));
+        btnHome.addActionListener(new ActionListener() 
+        {
+            public void actionPerformed(ActionEvent e) 
+            {
+                ((CardLayout) parent.getLayout()).show(parent, "Home");
+            }
+        });
         add(btnHome, BorderLayout.SOUTH);
     }
 }
@@ -201,8 +278,7 @@ class PersonPanel extends JPanel
     {
         setLayout(new BorderLayout());
 
-        JPanel infoPanel = new JPanel();
-        infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+        JPanel infoPanel = new JPanel(new GridLayout(4, 1));
         infoPanel.add(new JLabel("Name: " + name));
         infoPanel.add(new JLabel("DOB: " + dob));
         infoPanel.add(new JLabel(age));
@@ -240,13 +316,25 @@ class PersonPanel extends JPanel
         };
         add(imagePanel, BorderLayout.CENTER);
 
-        JPanel bottomPanel = new JPanel();
+        JPanel bottomPanel = new JPanel(new FlowLayout());
         JButton btnOther = new JButton("<html><center>See info for<br>the other person</center></html>");
-        btnOther.addActionListener(e -> ((CardLayout) parent.getLayout()).show(parent, otherCard));
+        btnOther.addActionListener(new ActionListener() 
+        {
+            public void actionPerformed(ActionEvent e) 
+            {
+                ((CardLayout) parent.getLayout()).show(parent, otherCard);
+            }
+        });
         bottomPanel.add(btnOther);
 
         JButton btnHome = new JButton("Home");
-        btnHome.addActionListener(e -> ((CardLayout) parent.getLayout()).show(parent, "Home"));
+        btnHome.addActionListener(new ActionListener() 
+        {
+            public void actionPerformed(ActionEvent e) 
+            {
+                ((CardLayout) parent.getLayout()).show(parent, "Home");
+            }
+        });
         bottomPanel.add(btnHome);
 
         add(bottomPanel, BorderLayout.SOUTH);
@@ -257,7 +345,8 @@ class DrawPanel extends JPanel
 {
     private int red = 255, green = 0, blue = 255, size = 100;
 
-    public DrawPanel(JPanel parent) {
+    public DrawPanel(JPanel parent) 
+    {
         setLayout(new BorderLayout());
 
         JPanel left = new JPanel(new GridLayout(4, 2));
@@ -282,10 +371,41 @@ class DrawPanel extends JPanel
             }
         };
 
-        sRed.addChangeListener(e -> { red = sRed.getValue(); right.repaint(); });
-        sGreen.addChangeListener(e -> { green = sGreen.getValue(); right.repaint(); });
-        sBlue.addChangeListener(e -> { blue = sBlue.getValue(); right.repaint(); });
-        sSize.addAdjustmentListener(e -> { size = sSize.getValue(); right.repaint(); });
+        sRed.addChangeListener(new ChangeListener() 
+        {
+            public void stateChanged(ChangeEvent e) 
+            {
+                red = sRed.getValue();
+                right.repaint();
+            }
+        });
+
+        sGreen.addChangeListener(new ChangeListener() 
+        {
+            public void stateChanged(ChangeEvent e) 
+            {
+                green = sGreen.getValue();
+                right.repaint();
+            }
+        });
+
+        sBlue.addChangeListener(new ChangeListener() 
+        {
+            public void stateChanged(ChangeEvent e) 
+            {
+                blue = sBlue.getValue();
+                right.repaint();
+            }
+        });
+
+        sSize.addAdjustmentListener(new java.awt.event.AdjustmentListener() 
+        {
+            public void adjustmentValueChanged(java.awt.event.AdjustmentEvent e) 
+            {
+                size = sSize.getValue();
+                right.repaint();
+            }
+        });
 
         left.setPreferredSize(new Dimension(200, 600));
         right.setPreferredSize(new Dimension(580, 600));
@@ -293,7 +413,13 @@ class DrawPanel extends JPanel
         add(right, BorderLayout.CENTER);
 
         JButton btnHome = new JButton("Home");
-        btnHome.addActionListener(e -> ((CardLayout) parent.getLayout()).show(parent, "Home"));
+        btnHome.addActionListener(new ActionListener() 
+        {
+            public void actionPerformed(ActionEvent e) 
+            {
+                ((CardLayout) parent.getLayout()).show(parent, "Home");
+            }
+        });
         add(btnHome, BorderLayout.SOUTH);
     }
 }
