@@ -4,12 +4,41 @@
  * 4/8/2025
  */
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.ButtonGroup;
+import javax.swing.JOptionPane;
+import javax.swing.SwingConstants;
+
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Graphics;
+import java.awt.GridLayout;
+import java.awt.Image;
+
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
 import java.io.File;
 import java.io.IOException;
+
+import javax.swing.JSlider;
 import javax.imageio.ImageIO;
+
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -32,11 +61,10 @@ class PutItTogetherHolder extends JPanel
     public PutItTogetherHolder() 
     {
         setLayout(new CardLayout());
+        Information info = new Information();
 
-        JTextField tfName = new JTextField();
-
-        FirstPagePanel first = new FirstPagePanel(this, tfName);
-        HomePanelHolder homeHolder = new HomePanelHolder(this, tfName);
+        FirstPagePanel first = new FirstPagePanel(this, info);
+        HomePanelHolder homeHolder = new HomePanelHolder(this, info);
 
         add(first, "First");
         add(homeHolder, "HomeHolder");
@@ -45,7 +73,7 @@ class PutItTogetherHolder extends JPanel
 
 class FirstPagePanel extends JPanel 
 {
-    public FirstPagePanel(JPanel parent, JTextField tfName) 
+    public FirstPagePanel(JPanel parent, Information info) 
     {
         setLayout(null);
 
@@ -60,6 +88,7 @@ class FirstPagePanel extends JPanel
         lblName.setBounds(10, 620, 150, 30);
         add(lblName);
 
+        JTextField tfName = new JTextField();
         tfName.setBounds(160, 620, 200, 30);
         add(tfName);
 
@@ -75,6 +104,7 @@ class FirstPagePanel extends JPanel
             {
                 if (cbUnderstand.isSelected() && !tfName.getText().trim().isEmpty()) 
                 {
+                    info.setName(tfName.getText().trim());
                     CardLayout cl = (CardLayout) parent.getLayout();
                     cl.show(parent, "HomeHolder");
                 } 
@@ -90,11 +120,11 @@ class FirstPagePanel extends JPanel
 
 class HomePanelHolder extends JPanel 
 {
-    public HomePanelHolder(JPanel parent, JTextField tfName) 
+    public HomePanelHolder(JPanel parent, Information info) 
     {
         setLayout(new CardLayout());
 
-        HomePanel home = new HomePanel(this, tfName);
+        HomePanel home = new HomePanel(this, info);
         BothPictPanel both = new BothPictPanel(this);
         PersonPanel p1 = new PersonPanel("Person 1", "01-01-1990", "Age: 35", "Hobbies: Reading, Traveling", "person1.jpg", this, "Person2");
         PersonPanel p2 = new PersonPanel("Person 2", "02-02-1992", "Age: 33", "Hobbies: Cooking, Hiking", "person2.jpg", this, "Person1");
@@ -110,11 +140,11 @@ class HomePanelHolder extends JPanel
 
 class HomePanel extends JPanel 
 {
-    public HomePanel(JPanel parent, JTextField tfName) 
+    public HomePanel(JPanel parent, Information info) 
     {
         setLayout(new BorderLayout());
 
-        JLabel lblWelcome = new JLabel("Welcome, " + tfName.getText(), SwingConstants.CENTER);
+        JLabel lblWelcome = new JLabel("Welcome, " + info.getName(), SwingConstants.CENTER);
         add(lblWelcome, BorderLayout.NORTH);
 
         JTextArea ta = new JTextArea("Please select which page you would like to see.\n\n"
@@ -368,9 +398,9 @@ class DrawPanel extends JPanel
             }
         });
 
-        sSize.addAdjustmentListener(new AdjustmentListener() 
+        sSize.addAdjustmentListener(new java.awt.event.AdjustmentListener() 
         {
-            public void adjustmentValueChanged(AdjustmentEvent e) 
+            public void adjustmentValueChanged(java.awt.event.AdjustmentEvent e) 
             {
                 size = sSize.getValue();
                 right.repaint();
@@ -391,5 +421,20 @@ class DrawPanel extends JPanel
             }
         });
         add(btnHome, BorderLayout.SOUTH);
+    }
+}
+
+class Information 
+{
+    private String name = "";
+
+    public String getName() 
+    {
+        return name;
+    }
+
+    public void setName(String name) 
+    {
+        this.name = name;
     }
 }
